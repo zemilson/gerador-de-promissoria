@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Promissória</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        #promissoria {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background-color: white;
+            display: none;
+        }
+        .promissoria-content {
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .signature-line {
+            width: 200px;
+            border-bottom: 1px solid black;
+            margin: 50px auto 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerador de Promissória</h1>
+        
+        <div class="form-group">
+            <label for="valor">Valor (R$)</label>
+            <input type="number" id="valor" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="vencimento">Data de Vencimento</label>
+            <input type="date" id="vencimento" required>
+        </div>
+
+        <div class="form-group">
+            <label for="emissao">Data de Emissão</label>
+            <input type="date" id="emissao" required>
+        </div>
+
+        <div class="form-group">
+            <label for="devedor">Nome do Devedor</label>
+            <input type="text" id="devedor" required>
+        </div>
+
+        <div class="form-group">
+            <label for="cpfDevedor">CPF do Devedor</label>
+            <input type="text" id="cpfDevedor" required>
+        </div>
+
+        <div class="form-group">
+            <label for="credor">Nome do Credor</label>
+            <input type="text" id="credor" required>
+        </div>
+
+        <div class="form-group">
+            <label for="cpfCredor">CPF do Credor</label>
+            <input type="text" id="cpfCredor" required>
+        </div>
+
+        <button onclick="gerarPromissoria()">Gerar Promissória</button>
+
+        <div id="promissoria">
+            <div class="promissoria-content">
+                <h2 style="text-align: center; margin-bottom: 20px;">NOTA PROMISSÓRIA</h2>
+                
+                <p>Valor: <span id="valorPromissoria"></span></p>
+                <p>Vencimento: <span id="vencimentoPromissoria"></span></p>
+                
+                <p style="margin-top: 20px;">
+                    Ao(s) <span id="vencimentoTexto"></span>, pagarei por esta única via de NOTA PROMISSÓRIA a 
+                    <span id="credorPromissoria"></span>, CPF: <span id="cpfCredorPromissoria"></span>, 
+                    ou à sua ordem, a quantia de <span id="valorExtenso"></span>.
+                </p>
+
+                <p>Pagável em qualquer banco até o vencimento.</p>
+
+                <p>Local e data de emissão: ___________________, <span id="emissaoPromissoria"></span></p>
+
+                <div style="text-align: center; margin-top: 50px;">
+                    <div class="signature-line"></div>
+                    <p><span id="devedorPromissoria"></span></p>
+                    <p>CPF: <span id="cpfDevedorPromissoria"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatarValor(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        function formatarData(data) {
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+
+        function gerarPromissoria() {
+            const valor = parseFloat(document.getElementById('valor').value);
+            const vencimento = document.getElementById('vencimento').value;
+            const emissao = document.getElementById('emissao').value;
+            const devedor = document.getElementById('devedor').value;
+            const cpfDevedor = document.getElementById('cpfDevedor').value;
+            const credor = document.getElementById('credor').value;
+            const cpfCredor = document.getElementById('cpfCredor').value;
+
+            // Preencher a promissória
+            document.getElementById('valorPromissoria').textContent = formatarValor(valor);
+            document.getElementById('vencimentoPromissoria').textContent = formatarData(vencimento);
+            document.getElementById('vencimentoTexto').textContent = formatarData(vencimento);
+            document.getElementById('emissaoPromissoria').textContent = formatarData(emissao);
+            document.getElementById('devedorPromissoria').textContent = devedor;
+            document.getElementById('cpfDevedorPromissoria').textContent = cpfDevedor;
+            document.getElementById('credorPromissoria').textContent = credor;
+            document.getElementById('cpfCredorPromissoria').textContent = cpfCredor;
+            document.getElementById('valorExtenso').textContent = formatarValor(valor) + ' (' + valor.toFixed(2) + ' reais)';
+
+            // Mostrar a promissória
+            document.getElementById('promissoria').style.display = 'block';
+
+            // Gerar PDF
+            const promissoria = document.getElementById('promissoria');
+            html2canvas(promissoria).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jspdf.jsPDF();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('promissoria.pdf');
+            });
+        }
+    </script>
+</body>
+</html> 
